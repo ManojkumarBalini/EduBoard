@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBoard - Student Progress Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #1abc9c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+            transition: var(--transition);
+            z-index: 100;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            margin-right: 12px;
+            color: var(--accent);
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            transition: var(--transition);
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-left h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification i {
+            font-size: 1.3rem;
+            color: var(--gray);
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .profile-name {
+            font-weight: 500;
+        }
+
+        /* Content Styles */
+        .content {
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--secondary);
+        }
+
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .bg-primary { background: rgba(52, 152, 219, 0.15); color: var(--secondary); }
+        .bg-success { background: rgba(46, 204, 113, 0.15); color: var(--success); }
+        .bg-warning { background: rgba(243, 156, 18, 0.15); color: var(--warning); }
+        .bg-accent { background: rgba(26, 188, 156, 0.15); color: var(--accent); }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+
+        /* Progress Table */
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            color: var(--gray);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .subject-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subject-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .subject-name {
+            font-weight: 500;
+        }
+
+        .subject-code {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        .progress-value {
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        /* Deadlines Section */
+        .deadlines-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .deadline-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .date-badge {
+            min-width: 70px;
+            height: 70px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .date-day {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .date-month {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .deadline-content {
+            flex: 1;
+        }
+
+        .deadline-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .deadline-subject {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.8rem;
+        }
+
+        .deadline-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .deadline-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .deadline-info-item i {
+            color: var(--secondary);
+        }
+
+        /* Profile Section */
+        .profile-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .profile-info h3 {
+            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-title {
+            color: var(--secondary);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            gap: 12px;
+        }
+
+        .detail-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(52, 152, 219, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .detail-content h4 {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+
+        .detail-content p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .overview-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .deadlines-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .logo h1, .nav-item span {
+                display: none;
+            }
+            
+            .logo {
+                justify-content: center;
+                padding: 0 0 1.5rem;
+            }
+            
+            .logo i {
+                margin-right: 0;
+                font-size: 2rem;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+                font-size: 1.4rem;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .profile-name {
+                display: none;
+            }
+            
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+            
+            .profile-info {
+                text-align: center;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+            
+            header {
+                padding: 1rem;
+            }
+            
+            .content {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+                font-size: 1.5rem;
+                color: var(--primary);
+                cursor: pointer;
+            }
+            
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+
+        /* Additional Styling */
+        .menu-toggle {
+            display: none;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-urgent {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger);
+        }
+
+        .status-upcoming {
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-graduation-cap"></i>
+            <h1>EduBoard</h1>
+        </div>
+        <nav class="nav-links">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Subjects</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Attendance</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <header>
+            <div class="header-left">
+                <div class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h2>Student Dashboard</h2>
+            </div>
+            <div class="header-right">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">3</span>
+                </div>
+                <div class="profile">
+                    <div class="profile-img">JS</div>
+                    <div class="profile-name">John Smith</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Overview Cards -->
+            <div class="overview-cards">
+                <div class="card">
+                    <div class="card-icon bg-primary">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="card-title">Current GPA</div>
+                    <div class="card-value">3.78</div>
+                    <div class="card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>0.12 from last term</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon bg-success">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="card-title">Attendance %</div>
+                    <div class="card-value">94.5%</div>
+                    <div class="card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>2.4% improvement</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon bg-warning">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="card-title">Assignments Due</div>
+                    <div class="card-value">3</div>
+                    <div class="card-change negative">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>2 urgent deadlines</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon bg-accent">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="card-title">Total Credits</div>
+                    <div class="card-value">128</div>
+                    <div class="card-change positive">
+                        <i class="fas fa-check-circle"></i>
+                        <span>32 to graduate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Table -->
+            <div class="section-title">
+                <i class="fas fa-chart-line"></i>
+                <h3>Subject Progress</h3>
+            </div>
+            <div class="progress-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Instructor</th>
+                            <th>Progress</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="subject-cell">
+                                    <div class="subject-icon" style="background-color: #3498db;">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                    <div>
+                                        <div class="subject-name">Advanced Calculus</div>
+                                        <div class="subject-code">MATH-301</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Dr. Robert Chen</td>
+                            <td>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 85%; background-color: #3498db;"></div>
+                                </div>
+                                <div class="progress-value">85%</div>
+                            </td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="subject-cell">
+                                    <div class="subject-icon" style="background-color: #2ecc71;">
+                                        <i class="fas fa-dna"></i>
+                                    </div>
+                                    <div>
+                                        <div class="subject-name">Molecular Biology</div>
+                                        <div class="subject-code">BIO-410</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Dr. Emily Johnson</td>
+                            <td>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 72%; background-color: #2ecc71;"></div>
+                                </div>
+                                <div class="progress-value">72%</div>
+                            </td>
+                            <td>B+</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="subject-cell">
+                                    <div class="subject-icon" style="background-color: #e74c3c;">
+                                        <i class="fas fa-flask"></i>
+                                    </div>
+                                    <div>
+                                        <div class="subject-name">Organic Chemistry</div>
+                                        <div class="subject-code">CHEM-350</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Prof. Michael Rodriguez</td>
+                            <td>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 65%; background-color: #e74c3c;"></div>
+                                </div>
+                                <div class="progress-value">65%</div>
+                            </td>
+                            <td>B</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="subject-cell">
+                                    <div class="subject-icon" style="background-color: #f39c12;">
+                                        <i class="fas fa-laptop-code"></i>
+                                    </div>
+                                    <div>
+                                        <div class="subject-name">Data Structures</div>
+                                        <div class="subject-code">CS-220</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Prof. Sarah Williams</td>
+                            <td>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 92%; background-color: #f39c12;"></div>
+                                </div>
+                                <div class="progress-value">92%</div>
+                            </td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="subject-cell">
+                                    <div class="subject-icon" style="background-color: #9b59b6;">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <div>
+                                        <div class="subject-name">Cognitive Psychology</div>
+                                        <div class="subject-code">PSY-250</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Dr. James Anderson</td>
+                            <td>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 78%; background-color: #9b59b6;"></div>
+                                </div>
+                                <div class="progress-value">78%</div>
+                            </td>
+                            <td>B+</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Upcoming Deadlines -->
+            <div class="section-title">
+                <i class="fas fa-calendar-day"></i>
+                <h3>Upcoming Deadlines</h3>
+            </div>
+            <div class="deadlines-section">
+                <div class="deadline-card">
+                    <div class="date-badge">
+                        <div class="date-day">12</div>
+                        <div class="date-month">Nov</div>
+                    </div>
+                    <div class="deadline-content">
+                        <div class="deadline-title">Quantum Mechanics Research Paper</div>
+                        <div class="deadline-subject">Physics 401 - Dr. Peterson</div>
+                        <div class="deadline-info">
+                            <div class="deadline-info-item">
+                                <i class="fas fa-book"></i>
+                                <span>12 pages</span>
+                            </div>
+                            <div class="deadline-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>3 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-badge status-urgent">Urgent</div>
+                </div>
+                <div class="deadline-card">
+                    <div class="date-badge">
+                        <div class="date-day">18</div>
+                        <div class="date-month">Nov</div>
+                    </div>
+                    <div class="deadline-content">
+                        <div class="deadline-title">Linear Algebra Problem Set</div>
+                        <div class="deadline-subject">Mathematics 302 - Prof. Davis</div>
+                        <div class="deadline-info">
+                            <div class="deadline-info-item">
+                                <i class="fas fa-file-alt"></i>
+                                <span>10 problems</span>
+                            </div>
+                            <div class="deadline-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>9 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-badge status-upcoming">Upcoming</div>
+                </div>
+            </div>
+
+            <!-- Student Profile -->
+            <div class="section-title">
+                <i class="fas fa-user-graduate"></i>
+                <h3>Student Profile</h3>
+            </div>
+            <div class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-avatar">JS</div>
+                    <div class="profile-info">
+                        <h3>John Smith</h3>
+                        <div class="profile-title">Computer Science Major</div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">3.78</div>
+                                <div class="stat-label">GPA</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">Junior</div>
+                                <div class="stat-label">Year</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">128</div>
+                                <div class="stat-label">Credits</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div class="detail-content">
+                            <h4>Student ID</h4>
+                            <p>S-2023-1742</p>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="detail-content">
+                            <h4>Email</h4>
+                            <p>john.smith@university.edu</p>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="detail-content">
+                            <h4>College</h4>
+                            <p>College of Engineering & Applied Sciences</p>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="detail-content">
+                            <h4>Department</h4>
+                            <p>Computer Science</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
